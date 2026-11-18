@@ -6,30 +6,71 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Web Scraper</title>
 <style>
-body{background:#0b1020;color:white;font-family:Arial;padding:20px}
-.box{max-width:450px;margin:50px auto;background:#182238;padding:22px;border-radius:15px}
-input,button{width:100%;padding:14px;margin:8px 0;box-sizing:border-box;border:0;border-radius:8px}
+body{background:#090e1c;color:white;font-family:Arial;padding:20px}
+.box{max-width:450px;margin:40px auto;background:#19243a;padding:22px;border-radius:16px}
+input,button{width:100%;padding:15px;margin:9px 0;box-sizing:border-box;border:0;border-radius:9px}
 button{background:#1689ed;color:white;font-weight:bold}
-pre{white-space:pre-wrap;overflow-wrap:anywhere}
+pre{white-space:pre-wrap;overflow-wrap:anywhere;background:#0b1323;padding:12px;border-radius:9px}
 </style>
 </head>
 <body>
 <div class="box">
 <h2>🌐 WEB SCRAPER</h2>
-<p>Masukkan URL website publik</p>
+<p>Masukkan URL website</p>
 <input id="url" placeholder="https://example.com">
-<button onclick="scrape()">MULAI SCRAPING</button>
-<pre id="hasil">Hasil akan muncul di sini.</pre>
+<button id="btn" onclick="scrape()">MULAI SCRAPING</button>
+<pre id="hasil">Menunggu URL...</pre>
+<button onclick="downloadResult()">DOWNLOAD JSON</button>
 </div>
+
 <script>
+let lastData = null;
+
 async function scrape(){
- const url=document.getElementById("url").value.trim();
- const hasil=document.getElementById("hasil");
- if(!/^https?:\/\//i.test(url)){
-  hasil.textContent="URL tidak valid";
+ const url = document.getElementById("url").value.trim();
+ const hasil = document.getElementById("hasil");
+ const btn = document.getElementById("btn");
+
+ btn.disabled = true;
+ hasil.textContent = "Sedang mengambil data...";
+
+ try{
+  const response = await fetch("/api/scrape",{
+   method:"POST",
+   headers:{"Content-Type":"application/json"},
+   body:JSON.stringify({url})
+  });
+
+  const data = await response.json();
+
+  if(!response.ok) throw new Error(data.error || "Gagal");
+
+  lastData = data;
+  hasil.textContent = JSON.stringify(data,null,2);
+
+ }catch(error){
+  hasil.textContent = "ERROR: " + error.message;
+ }finally{
+  btn.disabled = false;
+ }
+}
+
+function downloadResult(){
+ if(!lastData){
+  alert("Scraping belum berhasil");
   return;
  }
- hasil.textContent="Scraping membutuhkan backend Node.js.";
+
+ const blob = new Blob(
+  [JSON.stringify(lastData,null,2)],
+  {type:"application/json"}
+ );
+
+ const a = document.createElement("a");
+ a.href = URL.createObjectURL(blob);
+ a.download = "hasil-scraping.json";
+ a.click();
+ URL.revokeObjectURL(a.href);
 }
 </script>
 </body>
