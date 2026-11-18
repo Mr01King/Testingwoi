@@ -1,1 +1,36 @@
 
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Web Scraper</title>
+<style>
+body{background:#0b1020;color:white;font-family:Arial;padding:20px}
+.box{max-width:450px;margin:50px auto;background:#182238;padding:22px;border-radius:15px}
+input,button{width:100%;padding:14px;margin:8px 0;box-sizing:border-box;border:0;border-radius:8px}
+button{background:#1689ed;color:white;font-weight:bold}
+pre{white-space:pre-wrap;overflow-wrap:anywhere}
+</style>
+</head>
+<body>
+<div class="box">
+<h2>🌐 WEB SCRAPER</h2>
+<p>Masukkan URL website publik</p>
+<input id="url" placeholder="https://example.com">
+<button onclick="scrape()">MULAI SCRAPING</button>
+<pre id="hasil">Hasil akan muncul di sini.</pre>
+</div>
+<script>
+async function scrape(){
+ const url=document.getElementById("url").value.trim();
+ const hasil=document.getElementById("hasil");
+ if(!/^https?:\/\//i.test(url)){
+  hasil.textContent="URL tidak valid";
+  return;
+ }
+ hasil.textContent="Scraping membutuhkan backend Node.js.";
+}
+</script>
+</body>
+</html>
